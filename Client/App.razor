@@ -1,0 +1,23 @@
+﻿@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(Program).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                @* <Authorizing> *@
+                @*     Authorizing... *@
+                @* </Authorizing> *@
+                <NotAuthorized>
+                    @* 把重定向导航放到组件中 *@
+                    @* <RedirectToLogin/> *@
+                    <p>You should authorize.</p>
+                </NotAuthorized>
+            </AuthorizeRouteView>
+        </Found>
+        <NotFound>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <p>Sorry, there's nothing at this address.</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>

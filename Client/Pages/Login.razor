@@ -1,0 +1,78 @@
+@layout LoginLayout
+@page "/login"
+
+@using Microsoft.AspNetCore.WebUtilities
+@using MinimalBlazorAdmin.Client.Services
+@inject NavigationManager Navigation
+@inject IAuthService AuthService
+
+@attribute [AllowAnonymous]
+
+@if (ShowErrors)
+{
+    <div class="alert alert-danger" role="alert">
+        <p>@Error</p>
+    </div>
+}
+
+<div class="loginForm">
+    <h5 class="card-title">请输入账号</h5>
+    <EditForm Model="@model" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator/>
+
+        <div class="form-group">
+            <label for="name">Name</label>
+            <InputText Id="name" Class="form-control" @bind-Value="model.Name"/>
+            @* <ValidationMessage For="@(() => model.Name)"/> *@
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <InputText Id="password" type="password" Class="form-control" @bind-Value="model.Password"/>
+            @* <ValidationMessage For="@(() => model.Password)"/> *@
+        </div>
+        <ValidationSummary/>
+
+        <button type="submit" class="btn btn-primary">提交</button>
+    </EditForm>
+
+</div>
+
+@code {
+    private LoginDto model = new LoginDto();
+    public bool ShowErrors { get; set; }
+    public string Error { get; set; }
+
+    private async Task HandleValidSubmit()
+    {
+        Console.WriteLine("receive valid submit");
+
+        var result = await AuthService.LoginAsync(model);
+        if (result.Successful)
+        {
+            ReturnToUrl();
+        }
+        else
+        {
+            Error = result.Error;
+            ShowErrors = true;
+        }
+    }
+
+    private void ReturnToUrl()
+    {
+        var query = new Uri(Navigation.Uri).Query;
+        Console.WriteLine($"{query}");
+
+        if (QueryHelpers.ParseQuery(query).TryGetValue("returnUrl", out var value))
+        {
+    // queryValue = value;
+            Console.WriteLine($"should return to {value}");
+            Navigation.NavigateTo(value);
+        }
+        else
+        {
+            Navigation.NavigateTo("/");
+        }
+    }
+
+}

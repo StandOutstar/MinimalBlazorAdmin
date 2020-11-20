@@ -1,0 +1,11 @@
+.loginForm {
+    margin: 15% auto 15%;
+    padding: 15px;
+    width: fit-content;
+    height: 15%;
+    border: 2px solid #000000;
+    border-radius: 10px;
+}
+.loginForm button {
+    margin: auto 33%;
+}
