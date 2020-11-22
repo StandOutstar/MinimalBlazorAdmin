@@ -25,13 +25,20 @@ namespace MinimalBlazorAdmin.Client.Services
             _localStorageService = localStorageService;
         }
 
+        public async Task<RegisterResult> RegisterAsync(RegisterDto registerDto)
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/accounts", registerDto);
+            var registerResult = await response.Content.ReadFromJsonAsync<RegisterResult>();
+            return registerResult;
+        }
+        
         public async Task<LoginResult> LoginAsync(LoginDto loginDto)
         {
             // var loginJson = JsonSerializer.Serialize(loginDto);
             // var response = await _httpClient.PostAsync("auth/login",
             //     new StringContent(loginJson, Encoding.UTF8, "application/json"));
 
-            var response = await _httpClient.PostAsJsonAsync("auth/login", loginDto);
+            var response = await _httpClient.PostAsJsonAsync("api/login", loginDto);
             
             // var loginResult = JsonSerializer.Deserialize<LoginResult>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true});
 
@@ -59,6 +66,7 @@ namespace MinimalBlazorAdmin.Client.Services
 
     public interface IAuthService
     {
+        public Task<RegisterResult> RegisterAsync(RegisterDto registerDto);
         public Task<LoginResult> LoginAsync(LoginDto loginDto);
         public Task LogoutAsync();
     }

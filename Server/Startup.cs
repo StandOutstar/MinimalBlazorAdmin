@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Hosting;
@@ -6,6 +7,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using MinimalBlazorAdmin.Server.Data;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace MinimalBlazorAdmin.Server
 {
@@ -22,7 +29,30 @@ namespace MinimalBlazorAdmin.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            
+            services.AddDbContext<ApplicationDbContext>(options =>
+                    options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
 
+            services.AddDefaultIdentity<IdentityUser>()
+                .AddEntityFrameworkStores<ApplicationDbContext>();
+            
+            var tokenSection = Configuration.GetSection("Security:Token");
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuer = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = tokenSection["Issuer"],
+                        ValidAudience = tokenSection["Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenSection["Key"])),  // 长度必须超过 16 位
+                        ClockSkew = TimeSpan.Zero
+                    };
+                });
+            
             services.AddControllersWithViews();
             services.AddRazorPages();
         }
