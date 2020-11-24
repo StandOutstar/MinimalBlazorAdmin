@@ -11,7 +11,7 @@ namespace MinimalBlazorAdmin.Server.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = Policies.IsAdmin)]
     public class WeatherForecastController : ControllerBase
     {
         private static readonly string[] Summaries = new[]

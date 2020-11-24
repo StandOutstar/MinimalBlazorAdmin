@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Identity;
 using MinimalBlazorAdmin.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using MinimalBlazorAdmin.Shared;
 
 namespace MinimalBlazorAdmin.Server
 {
@@ -56,6 +57,8 @@ namespace MinimalBlazorAdmin.Server
             services.AddAuthorization(config =>
             {
                 // config.AddPolicy("asdf", policy => policy.Re);
+                config.AddPolicy(Policies.IsAdmin, Policies.IsAdminPolicy());
+                config.AddPolicy(Policies.IsUser, Policies.IsUserPolicy());
             });
             
             services.AddControllersWithViews();

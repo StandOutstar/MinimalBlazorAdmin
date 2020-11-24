@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MinimalBlazorAdmin.Client.Services;
+using MinimalBlazorAdmin.Shared;
 
 namespace MinimalBlazorAdmin.Client
 {
@@ -23,7 +24,12 @@ namespace MinimalBlazorAdmin.Client
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
             
             // authentication
-            builder.Services.AddAuthorizationCore();
+            builder.Services.AddAuthorizationCore(options =>
+            {
+                options.AddPolicy(Policies.IsAdmin, Policies.IsAdminPolicy());
+                options.AddPolicy(Policies.IsUser, Policies.IsUserPolicy());
+            });
+            
             builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthProvider>();
             
             // web storage
