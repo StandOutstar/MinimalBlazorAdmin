@@ -37,6 +37,8 @@ namespace MinimalBlazorAdmin.Client.Services
                 return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
             }
             
+            IsJwtExpire(savedToken);
+            
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", savedToken);
             
             Console.WriteLine("get authorize state.");
@@ -62,6 +64,25 @@ namespace MinimalBlazorAdmin.Client.Services
             var authenticateUser = new ClaimsPrincipal(new ClaimsIdentity(ParseClaimsFromJwt(token), "jwt"));
             var authState = Task.FromResult(new AuthenticationState(authenticateUser));
             NotifyAuthenticationStateChanged(authState);
+        }
+
+        public void IsJwtExpire(string jwt)
+        {
+            var payload = jwt.Split('.')[1];
+            var jsonBytes = ParseBase64WithoutPadding(payload);
+            var keyValuePairs = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonBytes);
+
+            keyValuePairs.TryGetValue("exp", out object expired);
+            if (expired != null)
+            {
+                Console.WriteLine($"token expired: {expired.ToString()}");
+                
+                var date = new DateTime(1970, 1, 1).AddSeconds(Double.Parse(expired.ToString()));
+                Console.WriteLine($"now: {DateTime.Now}");
+                Console.WriteLine($"token expired: {date.ToLocalTime()}");
+                // var expired = ;
+            }
+
         }
 
         /// <summary>
