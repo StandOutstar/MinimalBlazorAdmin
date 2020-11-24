@@ -50,7 +50,7 @@ namespace MinimalBlazorAdmin.Client.Services
             }
 
             await _localStorageService.SetItemAsync("authToken", loginResult.Token);
-            ((CustomAuthProvider)_authenticationStateProvider).MarkUserAuthenticated(loginDto);
+            ((CustomAuthProvider)_authenticationStateProvider).MarkUserAuthenticated(loginResult.Token);
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", loginResult.Token);
 
             return loginResult;

@@ -56,9 +56,10 @@ namespace MinimalBlazorAdmin.Client.Services
             NotifyAuthenticationStateChanged(authState);
         }
 
-        public void MarkUserAuthenticated(LoginDto loginDto)
+        public void MarkUserAuthenticated(string token)
         {
-            var authenticateUser = new ClaimsPrincipal(new ClaimsIdentity(new []{new Claim(ClaimTypes.Name, loginDto.Name)}, "jwt"));
+            // var authenticateUser = new ClaimsPrincipal(new ClaimsIdentity(new []{new Claim(ClaimTypes.Name, loginDto.Name)}, "jwt"));
+            var authenticateUser = new ClaimsPrincipal(new ClaimsIdentity(ParseClaimsFromJwt(token), "jwt"));
             var authState = Task.FromResult(new AuthenticationState(authenticateUser));
             NotifyAuthenticationStateChanged(authState);
         }

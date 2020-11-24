@@ -11,10 +11,12 @@ namespace MinimalBlazorAdmin.Server.Controllers
     public class AccountsController : ControllerBase
     {
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public AccountsController(UserManager<IdentityUser> userManager)
+        public AccountsController(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         [HttpPost]
@@ -30,6 +32,22 @@ namespace MinimalBlazorAdmin.Server.Controllers
 
                 return Ok(new RegisterResult { Successful = false, Errors = errors });
 
+            }
+
+            var role = await _roleManager.FindByNameAsync(registerDto.Role);
+            if (role != null)
+            {
+                var addToRoleresult = await _userManager.AddToRoleAsync(newUser, registerDto.Role);
+                if (!addToRoleresult.Succeeded)
+                {
+                    var errors = addToRoleresult.Errors.Select(x => x.Description);
+
+                    return Ok(new RegisterResult { Successful = false, Errors = errors });
+                }
+            }
+            else
+            {
+                return Ok(new RegisterResult { Successful = false, Errors = new[]{$"Role {registerDto.Role} not exist."}});
             }
 
             return Ok(new RegisterResult { Successful = true });

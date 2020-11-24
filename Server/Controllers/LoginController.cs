@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -32,28 +33,18 @@ namespace MinimalBlazorAdmin.Server.Controllers
             var result = await _signInManager.PasswordSignInAsync(loginDto.Name, loginDto.Password, false, false);
 
             if (!result.Succeeded) return BadRequest(new LoginResult { Successful = false, Error = "Username and password are invalid." });
+            
+            var user = await _signInManager.UserManager.FindByNameAsync(loginDto.Name);
+            var roles = await _signInManager.UserManager.GetRolesAsync(user);
 
-            var claims = new[]
+            var claims = new List<Claim>();
+            claims.Add(new Claim(ClaimTypes.Name, loginDto.Name));
+
+            foreach (var role in roles)
             {
-                new Claim(ClaimTypes.Name, loginDto.Name)
-            };
-
-            var tokenSource = _configuration.GetSection("Security:Token");
-
-            // var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenSource["JwtSecurityKey"]));
-            // var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            // var expiry = DateTime.Now.AddDays(Convert.ToInt32(tokenSource["JwtExpiryInDays"]));
-            //
-            // var token = new JwtSecurityToken(
-            //     tokenSource["JwtIssuer"],
-            //     tokenSource["JwtAudience"],
-            //     claims,
-            //     expires: expiry,
-            //     signingCredentials: creds
-            // );
-            //
-            // return Ok(new LoginResult { Successful = true, Token = new JwtSecurityTokenHandler().WriteToken(token) });
-            //
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
+            
             var tokenSection = _configuration.GetSection("Security:Token");
             
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenSection["Key"]));  // 长度必须超过 16 位

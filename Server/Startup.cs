@@ -34,6 +34,7 @@ namespace MinimalBlazorAdmin.Server
                     options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddDefaultIdentity<IdentityUser>()
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             
             var tokenSection = Configuration.GetSection("Security:Token");
@@ -52,6 +53,10 @@ namespace MinimalBlazorAdmin.Server
                         ClockSkew = TimeSpan.Zero
                     };
                 });
+            services.AddAuthorization(config =>
+            {
+                // config.AddPolicy("asdf", policy => policy.Re);
+            });
             
             services.AddControllersWithViews();
             services.AddRazorPages();

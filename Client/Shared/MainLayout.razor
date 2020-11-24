@@ -7,12 +7,35 @@
 
     <div class="main">
         <div class="top-row px-4">
+            <AuthorizeView Roles="Admin">
+                <Authorized>
+                    <div>
+                        @* 如果 ClaimsType 不一致，会导致获取的认证用户信息错误 *@
+                        <span>Admin: </span>
+                    </div>
+                </Authorized>
+            </AuthorizeView>
+            <AuthorizeView Roles="User">
+                <Authorized>
+                    <div>
+                        @* 如果 ClaimsType 不一致，会导致获取的认证用户信息错误 *@
+                        <span>User: </span>
+                    </div>
+                </Authorized>
+            </AuthorizeView>
+            @* <AuthorizeView> *@
+            @*     <Authorized> *@
+            @*         <div> *@
+            @*             $1$ 如果 ClaimsType 不一致，会导致获取的认证用户信息错误 #1# *@
+            @*             <span>@@ @context.User.Identity.Name <NavLink href="/logout">Logout</NavLink></span> *@
+            @*         </div> *@
+            @*     </Authorized> *@
+            @* </AuthorizeView> *@
             <AuthorizeView>
                 <Authorized>
                     <div>
                         @* 如果 ClaimsType 不一致，会导致获取的认证用户信息错误 *@
                         <span>@@ @context.User.Identity.Name <NavLink href="/logout">Logout</NavLink></span>
-
                     </div>
                 </Authorized>
                 <NotAuthorized>
