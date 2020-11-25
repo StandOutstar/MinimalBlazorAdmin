@@ -49,7 +49,8 @@ namespace MinimalBlazorAdmin.Server.Controllers
             
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenSection["Key"]));  // 长度必须超过 16 位
             var signCredential = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var expiry = DateTime.Now.AddDays(Convert.ToInt32(tokenSection["ExpireInDays"]));
+            // var expiry = DateTime.Now.AddDays(Convert.ToInt32(tokenSection["ExpireInDays"]));
+            var expiry = DateTime.Now.AddMinutes(5);
             
             var jwtToken = new JwtSecurityToken(
                 issuer: tokenSection["Issuer"],

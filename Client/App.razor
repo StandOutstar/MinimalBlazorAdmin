@@ -1,4 +1,9 @@
-﻿@inject AuthenticationStateProvider AuthenticationStateProvider
+﻿@using Blazored.LocalStorage
+@using System.Security.Claims
+@using MinimalBlazorAdmin.Client.Services
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject ILocalStorageService localStorageService
 
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(Program).Assembly">
@@ -21,3 +26,27 @@
         </NotFound>
     </Router>
 </CascadingAuthenticationState>
+
+@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        
+        var savedToken = await localStorageService.GetItemAsync<string>("authToken");
+
+        if (string.IsNullOrWhiteSpace(savedToken))
+        {
+            NavigationManager.NavigateTo("/login");
+        }
+
+        if (!((CustomAuthProvider) AuthenticationStateProvider).IsJwtValidExpire(savedToken))
+        {
+            NavigationManager.NavigateTo("/login");
+        }
+    }
+    
+    
+
+    
+}

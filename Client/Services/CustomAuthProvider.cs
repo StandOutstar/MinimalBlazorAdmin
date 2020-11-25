@@ -37,7 +37,7 @@ namespace MinimalBlazorAdmin.Client.Services
                 return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
             }
             
-            IsJwtExpire(savedToken);
+            // IsJwtValidExpire(savedToken);
             
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", savedToken);
             
@@ -66,7 +66,7 @@ namespace MinimalBlazorAdmin.Client.Services
             NotifyAuthenticationStateChanged(authState);
         }
 
-        public void IsJwtExpire(string jwt)
+        public bool IsJwtValidExpire(string jwt)
         {
             var payload = jwt.Split('.')[1];
             var jsonBytes = ParseBase64WithoutPadding(payload);
@@ -77,12 +77,27 @@ namespace MinimalBlazorAdmin.Client.Services
             {
                 Console.WriteLine($"token expired: {expired.ToString()}");
                 
-                var date = new DateTime(1970, 1, 1).AddSeconds(Double.Parse(expired.ToString()));
+                var expireDate = new DateTime(1970, 1, 1)
+                    .AddSeconds(Double.Parse(expired.ToString()))
+                    .ToLocalTime();
+                
                 Console.WriteLine($"now: {DateTime.Now}");
-                Console.WriteLine($"token expired: {date.ToLocalTime()}");
-                // var expired = ;
+                Console.WriteLine($"token expired: {expireDate}");
+
+                var currentDate = DateTime.Now;
+
+                if (currentDate.CompareTo(expireDate) < 0)
+                {
+                    Console.WriteLine("token valid expire");
+                }
+                else
+                {
+                    Console.WriteLine("token not valid expire");
+                }
+                return currentDate < expireDate;
             }
 
+            return false;
         }
 
         /// <summary>
